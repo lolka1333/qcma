@@ -41,17 +41,17 @@ jobs:
             make
 
       - name: Build VitaMTP and QCMA
+        shell: pwsh
         run: |
-          export MSYSTEM=MINGW64
-          export MINGW_PREFIX=/mingw64
-          B="${MINGW_PREFIX}/bin"
+          $script = @'
+          set -e
+          B="/mingw64/bin"
           export PATH="$B:$PATH"
           git clone --depth 1 https://github.com/codestation/vitamtp.git vitamtp-build
           cd vitamtp-build
-          # Fix setsockopt for Windows: API expects (const char *), not (int *)
           sed -i 's/SO_REUSEADDR, &reuseaddr/SO_REUSEADDR, (const char *)\&reuseaddr/' src/wireless.c
           ./autogen.sh
-          ./configure --prefix=$MINGW_PREFIX
+          ./configure --prefix=/mingw64
           make -j$(nproc)
           make install
           cd ..
@@ -66,6 +66,10 @@ jobs:
           cp "$B"/libiconv*.dll "$B"/zlib1.dll "$B"/liblzma*.dll "$B"/libbz2*.dll "$B"/libintl*.dll deploy/ 2>/dev/null || true
           cp "$B"/libpcre2*.dll "$B"/libfreetype*.dll "$B"/libpng*.dll "$B"/libharfbuzz*.dll deploy/ 2>/dev/null || true
           cp "$B"/libgraphite2.dll "$B"/libglib-2.0-0.dll "$B"/libsqlite3*.dll deploy/ 2>/dev/null || true
+          '@
+          $script | Out-File -FilePath build.sh -Encoding utf8NoBOM
+          $ws = ('/' + $env:GITHUB_WORKSPACE[0].ToString().ToLower() + $env:GITHUB_WORKSPACE.Substring(2)) -replace '\\', '/'
+          & "$env:RUNNER_TEMP\setup-msys2\msys2.cmd" -defterm -no-start -mingw64 -c "bash -l -c 'cd \"$ws\" && bash build.sh'"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
