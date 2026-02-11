@@ -49,6 +49,7 @@ jobs:
           make -j$(nproc)
           make install
           cd ..
+          export PATH="$MINGW_PREFIX/bin:$PATH"
           qmake
           make -j$(nproc)
           mkdir -p deploy
