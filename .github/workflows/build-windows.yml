@@ -55,6 +55,9 @@ jobs:
           make -j$(nproc)
           make install
           cd ..
+          LRELEASE="$B/lrelease"
+          [ -x "$LRELEASE" ] || LRELEASE="$B/lrelease-qt5"
+          $LRELEASE common/resources/translations/qcma_*.ts
           QMAKE="$B/qmake"
           [ -x "$QMAKE" ] || QMAKE="$B/qmake-qt5"
           $QMAKE CONFIG+=release
