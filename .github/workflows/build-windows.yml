@@ -78,7 +78,8 @@ jobs:
           cp "$B"/libvitamtp*.dll "$B"/libusb-1.0.dll "$B"/libxml2*.dll deploy/ 2>/dev/null || true
           cp "$B"/avcodec*.dll "$B"/avformat*.dll "$B"/avutil*.dll "$B"/swscale*.dll "$B"/swresample*.dll deploy/ 2>/dev/null || true
           cp "$B"/libva*.dll "$B"/libvpl*.dll "$B"/libbluray*.dll deploy/ 2>/dev/null || true
-          cp "$B"/libgme*.dll "$B"/libgnutls*.dll "$B"/libmodplug*.dll "$B"/librtmp*.dll deploy/ 2>/dev/null || true
+          cp "$B"/libgme*.dll "$B"/libgnutls*.dll "$B"/libmodplug*.dll "$B"/librtmp*.dll "$B"/libsrt*.dll "$B"/libssh*.dll deploy/ 2>/dev/null || true
+          cp "$B"/libdouble-conversion*.dll "$B"/libicu*.dll deploy/ 2>/dev/null || true
           cp "$B"/libgcc_s_seh-1.dll "$B"/libstdc++-6.dll "$B"/libwinpthread-1.dll deploy/ 2>/dev/null || true
           cp "$B"/libiconv*.dll "$B"/zlib1.dll "$B"/liblzma*.dll "$B"/libbz2*.dll "$B"/libintl*.dll deploy/ 2>/dev/null || true
           cp "$B"/libpcre2*.dll "$B"/libfreetype*.dll "$B"/libpng*.dll "$B"/libharfbuzz*.dll deploy/ 2>/dev/null || true
