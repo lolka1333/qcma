@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
     }
 
     QTranslator system_translator;
-    if(!system_translator.load("qt_" + locale, QLibraryInfo::path(QLibraryInfo::TranslationsPath))) {
+    if(!system_translator.load("qt_" + locale, QLibraryInfo::location(QLibraryInfo::TranslationsPath))) {
         qWarning() << "Cannot load system translation for locale:" << locale;
     } else {
         app.installTranslator(&system_translator);
