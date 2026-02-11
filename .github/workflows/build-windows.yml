@@ -51,11 +51,13 @@ jobs:
 
       - name: Build QCMA
         run: |
+          export PATH="$MINGW_PREFIX/bin:$PATH"
           qmake
           make -j$(nproc)
 
       - name: Prepare deploy (Qt DLLs)
         run: |
+          export PATH="$MINGW_PREFIX/bin:$PATH"
           mkdir -p deploy
           cp gui/release/qcma.exe deploy/ 2>/dev/null || cp gui/debug/qcma.exe deploy/
           windeployqt deploy/qcma.exe --release --no-translations
