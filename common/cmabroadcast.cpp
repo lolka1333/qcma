@@ -99,7 +99,7 @@ void CmaBroadcast::setAvailable()
                  .arg(broadcast_ok, uuid, "win", hostname)
                  .arg(protocol_version, 8, 10, QChar('0'))
                  .arg(QCMA_REQUEST_PORT)
-                 .arg(VITAMTP_WIRELESS_MAX_VERSION, 8, 10, QChar('0')).toStdString());
+                 .arg(VITAMTP_WIRELESS_MAX_VERSION, 8, 10, QChar('0')).toUtf8());
     reply.append('\0');
 }
 
@@ -113,6 +113,6 @@ void CmaBroadcast::setUnavailable()
                  .arg(broadcast_unavailable, uuid, "win", hostname)
                  .arg(protocol_version, 8, 10, QChar('0'))
                  .arg(QCMA_REQUEST_PORT)
-                 .arg(VITAMTP_WIRELESS_MAX_VERSION, 8, 10, QChar('0')).toStdString());
+                 .arg(VITAMTP_WIRELESS_MAX_VERSION, 8, 10, QChar('0')).toUtf8());
     reply.append('\0');
 }
