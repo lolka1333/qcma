@@ -64,8 +64,7 @@ void BackupItem::removeEntry()
 
 const QPixmap BackupItem::getIconPixmap()
 {
-    const QPixmap *p = ui->itemPicture->pixmap();
-    return p ? *p : QPixmap();
+    return ui->itemPicture->pixmap(Qt::ReturnByValue);
 }
 
 void BackupItem::setDirectory(const QString &path)

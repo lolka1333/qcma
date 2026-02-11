@@ -26,6 +26,8 @@ unix:!macx {
 win32 {
     # avoid alignment issues with newer mingw compiler
     QMAKE_CXXFLAGS += -mno-ms-bitfields
+    # suppress -I/include warning from Qt/MinGW mkspec (path may not exist in CI)
+    QMAKE_CXXFLAGS += -Wno-missing-include-dirs
 }
 
 # OS X config
