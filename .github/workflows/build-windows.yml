@@ -41,7 +41,7 @@ jobs:
 
       - name: Build VitaMTP and QCMA
         run: |
-          B="${{ steps.msys2.outputs['msys2-location'] }}/mingw64/bin"
+          B="${MINGW_PREFIX}/bin"
           git clone --depth 1 https://github.com/codestation/vitamtp.git vitamtp-build
           cd vitamtp-build
           # Fix setsockopt for Windows: API expects (const char *), not (int *)
