@@ -79,15 +79,15 @@ jobs:
           cp "$B"/avcodec*.dll "$B"/avformat*.dll "$B"/avutil*.dll "$B"/swscale*.dll "$B"/swresample*.dll deploy/ 2>/dev/null || true
           while true; do
             added=0
-            for f in deploy/*.exe deploy/*.dll deploy/platforms/*.dll 2>/dev/null; do
+            for f in deploy/*.exe deploy/*.dll deploy/platforms/*.dll; do
               [ -f "$f" ] || continue
-              while IFS= read -r path; do
+              for path in $(ldd "$f" 2>/dev/null | grep "=> $B/" | awk '{print $3}'); do
                 [ -z "$path" ] && continue
                 base=$(basename "$path")
                 if [ ! -f "deploy/$base" ] && [ ! -f "deploy/platforms/$base" ] && [ -f "$path" ]; then
                   cp "$path" deploy/ 2>/dev/null && added=1
                 fi
-              done < <(ldd "$f" 2>/dev/null | grep "=> $B/" | awk '{print $3}')
+              done
             done
             [ "$added" = 0 ] && break
           done
