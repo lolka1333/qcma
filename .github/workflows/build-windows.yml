@@ -1,0 +1,77 @@
+# Сборка QCMA под Windows (MSYS2 MinGW64)
+# Запуск: push / pull_request в master (или по кнопке в Actions)
+
+name: Build Windows
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >
+            git
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-qt5-base
+            mingw-w64-x86_64-qt5-tools
+            mingw-w64-x86_64-ffmpeg
+            mingw-w64-x86_64-pkg-config
+            mingw-w64-x86_64-libusb
+            mingw-w64-x86_64-libxml2
+            mingw-w64-x86_64-autotools
+            make
+
+      - name: Build VitaMTP
+        run: |
+          git clone --depth 1 https://github.com/codestation/vitamtp.git vitamtp-build
+          cd vitamtp-build
+          ./autogen.sh
+          ./configure --prefix=$MINGW_PREFIX
+          make -j$(nproc)
+          make install
+
+      - name: Build QCMA
+        run: |
+          qmake
+          make -j$(nproc)
+
+      - name: Prepare deploy (Qt DLLs)
+        run: |
+          mkdir -p deploy
+          cp gui/release/qcma.exe deploy/ 2>/dev/null || cp gui/debug/qcma.exe deploy/
+          windeployqt deploy/qcma.exe --release --no-translations
+
+      - name: Copy VitaMTP, FFmpeg and runtime DLLs
+        run: |
+          B=$MINGW_PREFIX/bin
+          cp "$B"/libvitamtp*.dll "$B"/libusb-1.0.dll "$B"/libxml2*.dll deploy/ 2>/dev/null || true
+          cp "$B"/avcodec*.dll "$B"/avformat*.dll "$B"/avutil*.dll "$B"/swscale*.dll "$B"/swresample*.dll deploy/ 2>/dev/null || true
+          cp "$B"/libgcc_s_seh-1.dll "$B"/libstdc++-6.dll "$B"/libwinpthread-1.dll deploy/ 2>/dev/null || true
+          cp "$B"/libiconv*.dll "$B"/zlib1.dll "$B"/liblzma*.dll "$B"/libbz2*.dll "$B"/libintl*.dll deploy/ 2>/dev/null || true
+          cp "$B"/libpcre2*.dll "$B"/libfreetype*.dll "$B"/libpng*.dll "$B"/libharfbuzz*.dll deploy/ 2>/dev/null || true
+          cp "$B"/libgraphite2.dll "$B"/libglib-2.0-0.dll "$B"/libsqlite3*.dll deploy/ 2>/dev/null || true
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: qcma-windows
+          path: deploy/
+          include-hidden-files: false
