@@ -49,14 +49,12 @@ jobs:
           make -j$(nproc)
           make install
           cd ..
-          MINGW_PREFIX=/mingw64
-          export PATH="$MINGW_PREFIX/bin:$PATH"
-          qmake
+          /mingw64/bin/qmake
           make -j$(nproc)
           mkdir -p deploy
           cp gui/release/qcma.exe deploy/ 2>/dev/null || cp gui/debug/qcma.exe deploy/
-          windeployqt deploy/qcma.exe --release --no-translations
-          B=$MINGW_PREFIX/bin
+          /mingw64/bin/windeployqt deploy/qcma.exe --release --no-translations
+          B=/mingw64/bin
           cp "$B"/libvitamtp*.dll "$B"/libusb-1.0.dll "$B"/libxml2*.dll deploy/ 2>/dev/null || true
           cp "$B"/avcodec*.dll "$B"/avformat*.dll "$B"/avutil*.dll "$B"/swscale*.dll "$B"/swresample*.dll deploy/ 2>/dev/null || true
           cp "$B"/libgcc_s_seh-1.dll "$B"/libstdc++-6.dll "$B"/libwinpthread-1.dll deploy/ 2>/dev/null || true
