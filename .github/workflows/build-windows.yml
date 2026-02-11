@@ -42,7 +42,7 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/codestation/vitamtp.git vitamtp-build
           cd vitamtp-build
-fix          # Fix setsockopt for Windows: API expects (const char *), not (int *)
+          # Fix setsockopt for Windows: API expects (const char *), not (int *)
           sed -i 's/SO_REUSEADDR, &reuseaddr/SO_REUSEADDR, (const char *)\&reuseaddr/' src/wireless.c
           ./autogen.sh
           ./configure --prefix=$MINGW_PREFIX
