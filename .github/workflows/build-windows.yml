@@ -22,6 +22,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup MSYS2
+        id: msys2
         uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW64
@@ -40,6 +41,7 @@ jobs:
 
       - name: Build VitaMTP and QCMA
         run: |
+          B="${{ steps.msys2.outputs['msys2-location'] }}/mingw64/bin"
           git clone --depth 1 https://github.com/codestation/vitamtp.git vitamtp-build
           cd vitamtp-build
           # Fix setsockopt for Windows: API expects (const char *), not (int *)
@@ -49,12 +51,11 @@ jobs:
           make -j$(nproc)
           make install
           cd ..
-          /mingw64/bin/qmake
+          "$B/qmake"
           make -j$(nproc)
           mkdir -p deploy
           cp gui/release/qcma.exe deploy/ 2>/dev/null || cp gui/debug/qcma.exe deploy/
-          /mingw64/bin/windeployqt deploy/qcma.exe --release --no-translations
-          B=/mingw64/bin
+          "$B/windeployqt" deploy/qcma.exe --release --no-translations
           cp "$B"/libvitamtp*.dll "$B"/libusb-1.0.dll "$B"/libxml2*.dll deploy/ 2>/dev/null || true
           cp "$B"/avcodec*.dll "$B"/avformat*.dll "$B"/avutil*.dll "$B"/swscale*.dll "$B"/swresample*.dll deploy/ 2>/dev/null || true
           cp "$B"/libgcc_s_seh-1.dll "$B"/libstdc++-6.dll "$B"/libwinpthread-1.dll deploy/ 2>/dev/null || true
