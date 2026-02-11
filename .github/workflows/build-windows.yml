@@ -77,13 +77,20 @@ jobs:
           fi
           cp "$B"/libvitamtp*.dll "$B"/libusb-1.0.dll "$B"/libxml2*.dll deploy/ 2>/dev/null || true
           cp "$B"/avcodec*.dll "$B"/avformat*.dll "$B"/avutil*.dll "$B"/swscale*.dll "$B"/swresample*.dll deploy/ 2>/dev/null || true
-          cp "$B"/libva*.dll "$B"/libvpl*.dll "$B"/libbluray*.dll deploy/ 2>/dev/null || true
-          cp "$B"/libgme*.dll "$B"/libgnutls*.dll "$B"/libmodplug*.dll "$B"/librtmp*.dll "$B"/libsrt*.dll "$B"/libssh*.dll deploy/ 2>/dev/null || true
-          cp "$B"/libdouble-conversion*.dll "$B"/libicu*.dll deploy/ 2>/dev/null || true
-          cp "$B"/libgcc_s_seh-1.dll "$B"/libstdc++-6.dll "$B"/libwinpthread-1.dll deploy/ 2>/dev/null || true
-          cp "$B"/libiconv*.dll "$B"/zlib1.dll "$B"/liblzma*.dll "$B"/libbz2*.dll "$B"/libintl*.dll deploy/ 2>/dev/null || true
-          cp "$B"/libpcre2*.dll "$B"/libfreetype*.dll "$B"/libpng*.dll "$B"/libharfbuzz*.dll deploy/ 2>/dev/null || true
-          cp "$B"/libgraphite2.dll "$B"/libglib-2.0-0.dll "$B"/libsqlite3*.dll deploy/ 2>/dev/null || true
+          while true; do
+            added=0
+            for f in deploy/*.exe deploy/*.dll deploy/platforms/*.dll 2>/dev/null; do
+              [ -f "$f" ] || continue
+              while IFS= read -r path; do
+                [ -z "$path" ] && continue
+                base=$(basename "$path")
+                if [ ! -f "deploy/$base" ] && [ ! -f "deploy/platforms/$base" ] && [ -f "$path" ]; then
+                  cp "$path" deploy/ 2>/dev/null && added=1
+                fi
+              done < <(ldd "$f" 2>/dev/null | grep "=> $B/" | awk '{print $3}')
+            done
+            [ "$added" = 0 ] && break
+          done
           '@
           $script | Out-File -FilePath build.sh -Encoding utf8NoBOM
           $ws = ('/' + $env:GITHUB_WORKSPACE[0].ToString().ToLower() + $env:GITHUB_WORKSPACE.Substring(2)) -replace '\\', '/'
